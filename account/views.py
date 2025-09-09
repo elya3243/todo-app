@@ -1,7 +1,7 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets, filters
 from .serializers import UserSerializer, UserInfoSerializer
 from django.contrib.auth.models import User
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 
 
 class UserCreateAPIView(generics.CreateAPIView):
@@ -17,3 +17,12 @@ class UserInfoView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    model = User
+    serializer_class = UserSerializer
+    permission_classes = [IsAdminUser]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['username', 'first_name']

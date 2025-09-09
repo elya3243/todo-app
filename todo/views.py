@@ -4,7 +4,8 @@ from django.db.models import Q
 from .models import Todo, Status
 from .serializers import TodoSerializer, TodoStatusSerializer
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated
+from datetime import datetime
 
 
 # Create your views here.
@@ -15,6 +16,7 @@ class TodoViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        Todo.objects.filter(due_date__lt=datetime.now())
         queryset = Todo.objects.filter(
             Q(assigned_to=user) | Q(assigned_to__isnull=True)
         )

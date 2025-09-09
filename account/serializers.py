@@ -1,13 +1,15 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from todo.models import Todo
 
 
 class UserSerializer(serializers.ModelSerializer):
+    assigned_task_count = serializers.SerializerMethodField()
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password']
+        fields = ['username', 'email', 'password', 'assigned_task_count']
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -16,6 +18,9 @@ class UserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+    def get_assigned_task_count(self, obj):
+        return Todo.objects.filter(assigned_to=obj).count()
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
